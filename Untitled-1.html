@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" rel="stylesheet">
+  <link rel="stylesheet" href="ff.css">
+  <title>Lab 2</title>
+</head>
+
+<body>
+  <ion-app>
+    <ion-router>
+      <ion-route url="/" component="page-one"></ion-route>
+      <ion-route url="/page-two" component="page-two"></ion-route>
+      <ion-route url="/page-three" component="page-three"></ion-route>
+      <ion-route url="/page-four" component="page-four"></ion-route>
+    </ion-router>
+
+    <ion-router-outlet></ion-router-outlet>
+
+    <script>
+      // Симуляция загрузки планет
+      async function fetchPlanetsData() {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, 2000); // Имитируем задержку
+        });
+      }
+      // Очистка localStorage и сохранение новых данных
+      function savePlanetsToLocalStorage() {
+        const planets = [
+          {
+            name: 'Адас',
+            url: '/page-four',
+            description: 'король ситхів планети Коррібан, який жив приблизно за часів експансії Раката в Галактиці.',
+            img: 'https://avatars.dzeninfra.ru/get-zen_doc/2463892/pub_5e8a0a348b13cf0c2d5b8cc8_5ec97e8a8ab85d61ea09f8b3/scale_2400'
+          },
+          {
+            name: 'Аджанта Полл',
+            url: '/page-three',
+            description: 'чутливий до Силі чоловік, людина, що загинув джедай, лідер групи темних джедаїв, які після закінчення «Столітньої Темряви», в результаті зазнавши поразки від джедаїв, були вигнані з території Республіки.',
+            img: 'https://masterpiecer-images.s3.yandex.net/a921d9563f8d11ee99a176ee417aaa37:upscaled'
+          },
+          {
+            name: 'Мейс Винду',
+            url: '/page-two',
+            description: 'наймолодший голова Вищої Ради джедаєв за всю історію Ордену і єдиний персонаж, що володіє фіолетовим мечем.',
+            img: 'https://upload.wikimedia.org/wikipedia/ru/thumb/7/7a/MaceW.jpg/375px-MaceW.jpg'
+          }
+        ];
+        localStorage.setItem('userPlanets', JSON.stringify(planets));
+      }
+
+      // Загрузка данных из localStorage
+      function loadPlanets() {
+        return JSON.parse(localStorage.getItem('userPlanets') || '[]');
+      }
+
+      // Рендеринг списка планет
+      function renderPlanets(planets) {
+        const content = document.querySelector('page-one').querySelector('ion-content');
+        const planetList = content.querySelector("#planet-list");
+        planetList.innerHTML = '';  // Очищаем перед добавлением новых карточек
+
+        planets.forEach(planet => {
+          planetList.innerHTML +=
+            `<ion-card>
+              <ion-router-link href="${planet.url}">
+                <img src="${planet.img}" alt="${planet.name}" style="width: 100%">
+                <ion-card-header>
+                  <ion-card-title>${planet.name}</ion-card-title>
+                  <ion-card-subtitle>Персонаж</ion-card-subtitle>
+                </ion-card-header>
+                <ion-card-content>${planet.description}</ion-card-content>
+              </ion-router-link>
+            </ion-card>`;
+        });
+      }
+
+      // Инициализация данных
+      async function initializePlanets() {
+        // Очищаем и сохраняем новые данные
+        savePlanetsToLocalStorage();
+        await fetchPlanetsData(); // Ждем загрузки
+        const planets = loadPlanets(); // Загружаем из localStorage
+        renderPlanets(planets); // Отображаем на странице
+        document.getElementById("loading-indicator").style.display = "none"; // Прячем индикатор загрузки
+      }
+
+      class PageOne extends HTMLElement {
+        connectedCallback() {
+          this.innerHTML =
+          
+            `<ion-header>
+              <ion-toolbar>
+                <ion-title>Персонажі</ion-title>
+              </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+              <div id="loading-indicator" style="text-align: center; margin-top: 20px;">
+                <ion-spinner name="dots"></ion-spinner> Завантаження...
+              </div>
+              <div id="planet-list"></div>
+            </ion-content>`;
+
+          initializePlanets(); // Инициализация планет
+        }
+      }
+
+      class PageTwo extends HTMLElement {
+        connectedCallback() {
+          this.innerHTML =
+            `<ion-header>
+              <ion-toolbar>
+                <ion-title>Мейс Винду</ion-title>
+              </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+              <ion-breadcrumbs>
+                <ion-breadcrumb href="/">Головна</ion-breadcrumb>
+                <ion-breadcrumb href="/page-one">Персонаж</ion-breadcrumb>
+              </ion-breadcrumbs>
+              <img src="https://upload.wikimedia.org/wikipedia/ru/thumb/7/7a/MaceW.jpg/375px-MaceW.jpg" alt="Mercury">
+              <ion-card-subtitle>Мейс Винду</ion-card-subtitle>
+              <ion-card-content>
+    <p class="custom-text">наймолодший голова Вищої Ради джедаєв за всю історію Ордену і єдиний персонаж, що володіє фіолетовим мечем.</p>
+    <ion-chip color="primary">Світлий джедай</ion-chip>
+    <ion-chip color="danger">Чоловік</ion-chip>
+    <ion-chip color="success">Лідер</ion-chip>
+</ion-card-content>
+
+            </ion-content>`;
+        }
+      }
+
+      class PageThree extends HTMLElement {
+        connectedCallback() {
+          this.innerHTML =
+            `<ion-header>
+              <ion-toolbar>
+                <ion-title>Аджанта Полл</ion-title>
+              </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+              <ion-breadcrumbs>
+                <ion-breadcrumb href="/">Головна</ion-breadcrumb>
+                <ion-breadcrumb href="/page-one">Аджанта Полл</ion-breadcrumb>
+              </ion-breadcrumbs>
+              <img src="https://masterpiecer-images.s3.yandex.net/a921d9563f8d11ee99a176ee417aaa37:upscaled" alt="Ajanta">
+              <ion-card-subtitle>Персонаж</ion-card-subtitle>
+                   <ion-card-content>
+    <p class="custom-text">чутливий до Силі чоловік, людина, що загинув джедай, лідер групи темних джедаїв, які після закінчення «Столітньої Темряви», в результаті зазнавши поразки від джедаїв, були вигнані з території Республіки.</p>
+    <ion-chip color="primary">Темний джедай</ion-chip>
+    <ion-chip color="danger">Чоловік</ion-chip>
+    <ion-chip color="success">Лідер</ion-chip>
+</ion-card-content>
+            </ion-content>`;
+            
+        }
+      }
+
+      class PageFour extends HTMLElement {
+        connectedCallback() {
+          this.innerHTML =
+            `<ion-header>
+              <ion-toolbar>
+                <ion-title>Адас</ion-title>
+              </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+              <ion-breadcrumbs>
+                <ion-breadcrumb href="/">Головна</ion-breadcrumb>
+                <ion-breadcrumb href="/page-one">Адас</ion-breadcrumb>
+              </ion-breadcrumbs>
+              <img src="https://avatars.dzeninfra.ru/get-zen_doc/2463892/pub_5e8a0a348b13cf0c2d5b8cc8_5ec97e8a8ab85d61ea09f8b3/scale_2400" alt="Mars">
+              <ion-card-subtitle>Персонаж</ion-card-subtitle>
+                         <ion-card-content>
+    <p class="custom-text"> Король ситхов планети Коррібан, який жив приблизно за часів експансії Раката в Галактиці.</p>
+    <ion-chip color="primary">Сітх</ion-chip>
+    <ion-chip color="danger">Чоловік</ion-chip>
+    <ion-chip color="success">Король</ion-chip>
+</ion-card-content>
+            </ion-content>`;
+            
+        }
+      }
+
+      customElements.define('page-one', PageOne);
+      customElements.define('page-two', PageTwo);
+      customElements.define('page-three', PageThree);
+      customElements.define('page-four', PageFour);
+    </script>
+  </ion-app>
+</body>
+
+</html>
